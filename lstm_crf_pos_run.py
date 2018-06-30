@@ -142,6 +142,10 @@ class BiLSTM_CRF(nn.Module):
 with open('word2id.pickle', 'rb') as f:
     word2id = pickle.load(f)
 
+# load id2word
+with open('id2word.pickle', 'rb') as f:
+    id2word = pickle.load(f)
+
 # load pos2id
 with open('pos2id.pickle', 'rb') as f:
     pos2id = pickle.load(f)
@@ -171,10 +175,10 @@ aspects = []
 i = 0
 while(i < len(sentence)):
     if tags[i] == 1:
-        aspect = sentence[i]
+        aspect = id2word[sentence[i].tolist()]
         i += 1
         while(i < len(sentence) and tags[i]==2):
-            aspect += " " + sentence[i]
+            aspect += " " + id2word[sentence[i].tolist()]
             i += 1
         aspects.append(aspect)
     else:
