@@ -4,6 +4,9 @@ import torch.nn as nn
 import pickle
 from nltk import word_tokenize
 from nltk import pos_tag
+import sys
+
+print(sys.argv[1])
 
 torch.manual_seed(1)
 
@@ -142,10 +145,6 @@ class BiLSTM_CRF(nn.Module):
 with open('word2id.pickle', 'rb') as f:
     word2id = pickle.load(f)
 
-# load id2word
-with open('id2word.pickle', 'rb') as f:
-    id2word = pickle.load(f)
-
 # load pos2id
 with open('pos2id.pickle', 'rb') as f:
     pos2id = pickle.load(f)
@@ -153,10 +152,13 @@ with open('pos2id.pickle', 'rb') as f:
 # load the trained model
 model = torch.load("best_model_lstm_crf_pos.pt")
 
-sentence = "I like this beef very much, the service is amazing as well"
+sentence = sys.argv[1]
 
 # tokenize the sentence
 sentence = word_tokenize(sentence)
+
+# keep original sentence tokens to get the output
+original_sentence = sentence
 
 # obtain the pos tags
 sentence_pos = map(lambda tag: pos2id[tag] if tag in pos2id else pos2id['<unk>'], [x[1] for x in pos_tag(sentence)])
@@ -175,10 +177,10 @@ aspects = []
 i = 0
 while(i < len(sentence)):
     if tags[i] == 1:
-        aspect = id2word[sentence[i].tolist()]
+        aspect = original_sentence[i]
         i += 1
         while(i < len(sentence) and tags[i]==2):
-            aspect += " " + id2word[sentence[i].tolist()]
+            aspect += " " + original_sentence[i]
             i += 1
         aspects.append(aspect)
     else:
